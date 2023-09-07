@@ -1,0 +1,7 @@
+bin
+obj
+/packages
+Guilds.sln.DotSettings.user
+.idea
+.vs
+**/Icons/Badges
