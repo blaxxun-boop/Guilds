@@ -16,7 +16,7 @@ namespace Guilds;
 public class Guilds : BaseUnityPlugin
 {
 	private const string ModName = "Guilds";
-	private const string ModVersion = "1.0.0";
+	private const string ModVersion = "1.0.1";
 	private const string ModGUID = "org.bepinex.plugins.guilds";
 
 	public static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -43,6 +43,7 @@ public class Guilds : BaseUnityPlugin
 	internal static ConfigEntry<Color> guildChatColor = null!;
 	internal static ConfigEntry<int> minimumGuildNameLength = null!;
 	internal static ConfigEntry<int> maximumGuildNameLength = null!;
+	internal static ConfigEntry<uint> maximumGuildMembers = null!;
 	internal static ConfigEntry<Toggle> allowGuildCreation = null!;
 	internal static ConfigEntry<KeyboardShortcut> guildPingHotkey = null!;
 
@@ -77,6 +78,7 @@ public class Guilds : BaseUnityPlugin
 		};
 		allowGuildCreation = config("1 - General", "Allow Guild Creation", Toggle.On, new ConfigDescription("If off, only admins can create new guilds."));
 		guildPingHotkey = config("1 - General", "Guild Ping Modifier Key", new KeyboardShortcut(KeyCode.LeftShift), new ConfigDescription("Modifier key that has to be pressed while pinging the map, to make the map ping visible to guild members only."), false);
+		maximumGuildMembers = config("1 - General", "Maximum Guild Members", 0U, new ConfigDescription("Maximum number of guild members per guild. Set to 0 for no maximum."));
 
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Harmony harmony = new(ModGUID);

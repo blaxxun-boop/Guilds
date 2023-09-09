@@ -84,8 +84,10 @@ guilds_name_too_short: "Name too short"
 guilds_name_too_short_details: "Please choose a longer name for your guild. Minimum is $1 characters."
 guilds_name_too_long: "Name too long"
 guilds_name_too_long_details: "Please choose a shorter name for your guild. Maximum is $1 characters."
-guilds_creation_admin_only: "Admin only."
+guilds_creation_admin_only: "Admin only"
 guilds_creation_admin_only_details: "The servers configuration only allows admins to create new guilds."
+guilds_guild_full: "Guild full"
+guilds_guild_full_details: "Your guild has reached the maximum number of members. You cannot accept new members into the guild."
 
 # Other
 guilds_application_accepted: "You have been accepted into the guild $1!"

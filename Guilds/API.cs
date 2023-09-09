@@ -11,6 +11,15 @@ namespace Guilds;
 [PublicAPI]
 public static class API
 {
+	public static bool IsLoaded()
+	{
+#if API
+		return false;
+#else
+		return true;
+#endif
+	}
+
 	public static Guild? GetPlayerGuild(PlayerReference player)
 	{
 #if API

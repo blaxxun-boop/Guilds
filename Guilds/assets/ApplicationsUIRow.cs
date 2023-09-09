@@ -77,6 +77,12 @@ namespace Guilds
 
 		public void OnAcceptMember_ButtonClicked()
 		{
+			if (Guilds.maximumGuildMembers.Value > 0 && guild.Members.Count >= Guilds.maximumGuildMembers.Value)
+			{
+				UnifiedPopup.Push(new WarningPopup("$guilds_guild_full", "$guilds_guild_full_details", (PopupButtonCallback)UnifiedPopup.Pop));
+				return;
+			}
+			
 			API.RemovePlayerApplication(applicant, guild);
 			API.AddPlayerToGuild(applicant, guild);
 

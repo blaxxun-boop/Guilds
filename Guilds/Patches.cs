@@ -17,7 +17,7 @@ public static class Patches
 	{
 		private static bool Prefix(Character __instance, HitData hit)
 		{
-			if (__instance is Player target && hit.GetAttacker() is Player attacker)
+			if (__instance is Player target && hit.GetAttacker() is Player attacker && hit.m_statusEffectHash != "Staff_shield".GetStableHashCode())
 			{
 				if (API.GetPlayerGuild(target) is { } guild && guild.Name == API.GetPlayerGuild(attacker)?.Name && Guilds.friendlyFire.Value == Toggle.Off)
 				{
