@@ -16,6 +16,7 @@ public class GuildConfigSerialized
 	public GuildGeneral general = new();
 	public List<GuildMemberClass> members = new();
 	public List<ApplicationClass> applications = new();
+	public Dictionary<string, AchievementData> achievements = new();
 #if ! API
 	[YamlMember(Alias = "custom data", ApplyNamingConventions = false)]
 #endif
@@ -27,6 +28,7 @@ public class GuildConfigSerialized
 		Members = new Dictionary<PlayerReference, GuildMember>(members.ToDictionary(m => m.player, m => new GuildMember { rank = m.rank, lastOnline = m.lastOnline } )),
 		General = general,
 		Applications = new Dictionary<PlayerReference, Application>(applications.ToDictionary(a => a.player, a => new Application { applied = a.applied, description = a.description } )),
+		Achievements = achievements,
 		customData = customData,
 	};
 
@@ -36,6 +38,7 @@ public class GuildConfigSerialized
 		applications = from.Applications.Select(kv => new ApplicationClass { player = kv.Key, applied = kv.Value.applied, description = kv.Value.description }).ToList(),
 		general = from.General,
 		customData = from.customData,
+		achievements = from.Achievements,
 	};
 }
 	

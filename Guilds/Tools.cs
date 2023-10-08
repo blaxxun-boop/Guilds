@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ public static class Tools
 
 	internal static Sprite loadSprite(string name, int width, int height) => Sprite.Create(loadTexture(name), new Rect(0, 0, width, height), Vector2.zero);
 
-	private static byte[] ReadEmbeddedFileBytes(string name)
+	public static byte[] ReadEmbeddedFileBytes(string name)
 	{
 		using MemoryStream stream = new();
 		Assembly.GetExecutingAssembly().GetManifestResourceStream("Guilds." + name)?.CopyTo(stream);
@@ -95,5 +96,18 @@ public static class Tools
 
 			return '\0';
 		}
+	}
+	
+	public static List<Player> GetNearbyGuildMembers(Player player, float range, bool includeSelf = false)
+	{
+		if (API.GetPlayerGuild(player) is not { } guild)
+		{
+			return new List<Player>();
+		}
+		List<PlayerReference> guildPlayers = API.GetOnlinePlayers(guild).ToList();
+		List<Player> nearbyPlayers = new();
+		Player.GetPlayersInRange(player.transform.position, range, nearbyPlayers);
+		nearbyPlayers.RemoveAll(p => !guildPlayers.Contains(PlayerReference.fromPlayer(p)) || (!includeSelf && p == player));
+		return nearbyPlayers;
 	}
 }

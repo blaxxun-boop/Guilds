@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using StatManager;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -96,6 +97,11 @@ namespace Guilds
 		public Image leaveGuildButtonImage = null!;
 		public TextMeshProUGUI leaveGuildButtonText = null!;
 
+		[Header("Achievements Button")]
+		public Button achievementsButton = null!;
+		public Image achievementsButtonImage = null!;
+		public TextMeshProUGUI achievementsButtonText = null!;
+		
 		[Header("Edit Guild Button")]
 		public Button editGuildButton = null!;
 		public Image editGuildButtonImage = null!;
@@ -211,6 +217,11 @@ namespace Guilds
 		public void ButtonCloseClicked()
 		{
 			Interface.HideUI();
+		}
+
+		public void ButtonAchievementsClicked()
+		{
+			Interface.SwitchUI(Interface.AchievementUI);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,7 @@ internal static class GuildList
 	public static readonly Dictionary<string, Guild> guildList = new();
 	public static readonly Dictionary<int, Guild> guildsById = new();
 	private static readonly Dictionary<string, Guild> guildBackup = new();
+	private static HashSet<int> guildsWithPendingChanges = new();
 
 	public static void Init()
 	{
@@ -58,7 +60,7 @@ internal static class GuildList
 							throw new InvalidDataException($"Invalid character {(int)c} in guild name");
 						}
 					}
-					
+
 					if (GuildSerialization.Deserialize<Guild?>(syncedEntry.Value) is { } guild)
 					{
 						Guild guildCopy = GuildSerialization.Deserialize<Guild>(syncedEntry.Value);
@@ -111,6 +113,27 @@ internal static class GuildList
 				}
 			}
 		};
+	}
+
+	private static void DelayedGuildUpdate(int guild)
+	{
+		if (guildsWithPendingChanges.Count == 0)
+		{
+			IEnumerator NotifyPendingChanges()
+			{
+				yield return new WaitForSeconds(1);
+				HashSet<int> changedGuilds = guildsWithPendingChanges;
+				guildsWithPendingChanges = new HashSet<int>();
+				foreach (int guild in changedGuilds)
+				{
+					WriteGuild(guild);
+				}
+			}
+
+			Guilds.self.StartCoroutine(NotifyPendingChanges());
+		}
+
+		guildsWithPendingChanges.Add(guild);
 	}
 
 	public static void readGuildFiles()
@@ -166,10 +189,12 @@ internal static class GuildList
 				peer.m_rpc.Register<ZPackage>("Guild Update Guild", UpdateGuild);
 				peer.m_rpc.Register<ZPackage>("Guild Remove Guild", RemoveGuild);
 				peer.m_rpc.Register<ZPackage>("Guild Rename Guild", RenameGuild);
+				peer.m_rpc.Register<ZPackage>("Guild Increase Achievement", IncreaseAchievement);
 			}
 			else
 			{
 				peer.m_rpc.Register<int>("Guild Update Ack", AckUpdate);
+				peer.m_rpc.Register<string, string, string>("Guild Achievement Completed", CompletedAchievement);
 			}
 		}
 
@@ -249,10 +274,81 @@ internal static class GuildList
 			}
 		}
 
-		private static void WriteGuild(string guildName)
+		public static void IncreaseAchievement(ZRpc? rpc, ZPackage package)
 		{
-			guildEntries.Value[guildName] = GuildSerialization.Serialize(guildList[guildName]);
-			guildEntries.Value = guildEntries.Value;
+			int guildId = package.ReadInt();
+			string achievement = package.ReadString();
+			float increment = package.ReadSingle();
+
+			if (guildsById.TryGetValue(guildId, out Guild guild) && Achievements.GetAchievementConfig(achievement) is {} config)
+			{
+				if (!guild.Achievements.TryGetValue(achievement, out AchievementData data))
+				{
+					guild.Achievements[achievement] = data = new AchievementData();
+					if (config.first && API.GetGuilds().Any(g => g.Achievements.TryGetValue(achievement, out AchievementData guildData) && guildData.progress is null))
+					{
+						data.progress = null;
+					}
+				}
+
+				if (data.progress is not null && data.completed.Count < config.progress.Count)
+				{
+					data.progress += increment;
+					if (data.progress >= config.progress[data.completed.Count])
+					{
+						if (config.first)
+						{
+							foreach (Guild g in API.GetGuilds())
+							{
+								if (g.Achievements.TryGetValue(achievement, out AchievementData achiev))
+								{
+									achiev.progress = null;
+								}
+							}
+						}
+
+						data.completed.Add(DateTime.Now);
+						guild.General.level += config.GetLevel(data.completed.Count);
+						WriteGuild(guildId);
+
+						PlayerReference player = PlayerReference.fromRPC(rpc);
+						foreach (ZNetPeer peer in ZNet.instance.GetConnectedPeers())
+						{
+							peer.m_rpc.Invoke("Guild Achievement Completed", player.name, player.id, achievement);
+						}
+						CompletedAchievement(null, player.name, player.id, achievement);
+						
+						return;
+					}
+					
+					DelayedGuildUpdate(guildId);
+				}
+			}
+		}
+
+		private static void CompletedAchievement(ZRpc? rpc, string name, string id, string achievement)
+		{
+			PlayerReference player = new() { id = id, name = name };
+			foreach (API.AchievementCompleted callback in Achievements.achievementCompletedCallbacks)
+			{
+				callback(player, achievement);
+			}
+		}
+	}
+
+	private static void WriteGuild(string guildName)
+	{
+		guildsWithPendingChanges.Remove(guildList[guildName].General.id);
+		guildEntries.Value[guildName] = GuildSerialization.Serialize(guildList[guildName]);
+		guildEntries.Value = guildEntries.Value;
+	}
+
+	private static void WriteGuild(int guildId)
+	{
+		if (guildsById.TryGetValue(guildId, out Guild guild))
+		{
+			
+			WriteGuild(guild.Name);
 		}
 	}
 
@@ -363,6 +459,29 @@ internal static class GuildList
 				zpkg.SetPos(0);
 				GuildListManipulationListener.AddGuild(null, zpkg);
 			}
+		}
+	}
+
+	public static void increaseAchievement(int guildId, string achievement, float increment)
+	{
+		if (Achievements.GetAchievementConfig(achievement) is not { } config || (config.guild is {} guilds && !guilds.Contains(guildId)))
+		{
+			return;
+		}
+		
+		ZPackage zpkg = new();
+		zpkg.Write(guildId);
+		zpkg.Write(achievement);
+		zpkg.Write(increment);
+
+		if (ZNet.instance.GetServerRPC() is { } rpc)
+		{
+			rpc.Invoke("Guild Increase Achievement", zpkg);
+		}
+		else
+		{
+			zpkg.SetPos(0);
+			GuildListManipulationListener.IncreaseAchievement(null, zpkg);
 		}
 	}
 }

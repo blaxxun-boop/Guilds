@@ -152,6 +152,7 @@ namespace Guilds
 			if (guild.Name != Col2InputFieldGuildName.text && !API.RenameGuild(guild, Col2InputFieldGuildName.text.Trim()))
 			{
 				UnifiedPopup.Push(new WarningPopup("$guilds_name_taken", "$guilds_name_taken_details", (PopupButtonCallback)UnifiedPopup.Pop));
+				return;
 			}
 
 			Interface.SwitchUI(Interface.GuildManagementUI);

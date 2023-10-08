@@ -19,6 +19,7 @@ public class Guild
 	public GuildGeneral General = new();
 	public Dictionary<PlayerReference, GuildMember> Members = new();
 	public Dictionary<PlayerReference, Application> Applications = new();
+	public Dictionary<string, AchievementData> Achievements = new();
 	public CustomData customData = new();
 }
 
@@ -57,10 +58,64 @@ public class Application
 }
 
 [PublicAPI]
+public class AchievementData
+{
+	public float? progress = 0;
+	public List<DateTime> completed = new();
+}
+
+[PublicAPI]
 public class CustomData
 {
 	internal Dictionary<Type, object> data = new();
 	internal Dictionary<string, object> unknown = new();
+}
+
+[PublicAPI]
+public class AchievementConfig
+{
+	public string name = "";
+	public string description = "";
+	public List<float> progress = new() { 1 };
+	public List<int>? guild = null;
+	public List<int> level = new();
+	public string icon = "";
+	public bool first;
+	public Dictionary<string, string> config = new();
+
+	public T getConfigValue<T>(string name, T defaultValue = default!)
+	{
+#if ! API
+		if (config.TryGetValue(name, out string value))
+		{
+			if (typeof(T) == typeof(int))
+			{
+				if (int.TryParse(value, out int integer))
+				{
+					return (T)(object)integer;
+				}
+			}
+			else if (typeof(T) == typeof(float))
+			{
+				if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out float number))
+				{
+					return (T)(object)number;
+				}
+			}
+			else
+			{
+				return (T)(object)value;
+			}
+		}
+#endif
+		return defaultValue;
+	}
+
+#if ! API
+	internal int GetLevel(int completed) => completed <= level.Count ? level[completed - 1] : level.Max();
+
+	internal UnityEngine.Sprite? GetIcon() => Interface.AchievementIcons.TryGetValue(icon, out UnityEngine.Sprite sprite) ? sprite : null;
+#endif
 }
 
 [PublicAPI]
@@ -71,6 +126,9 @@ public struct PlayerReference
 	public static PlayerReference fromPlayerInfo(ZNet.PlayerInfo playerInfo) => new() { id = playerInfo.m_host.IsNullOrWhiteSpace() ? PrivilegeManager.GetNetworkUserId() : playerInfo.m_host.Contains("_") ? playerInfo.m_host : $"Steam_{playerInfo.m_host}", name = playerInfo.m_name ?? "" };
 	public static PlayerReference fromPlayer(Player player) => player == Player.m_localPlayer ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.FirstOrDefault(info => info.m_characterID == player.GetZDOID()));
 	public static PlayerReference forOwnPlayer() => new() { id = PrivilegeManager.GetNetworkUserId(), name = Game.instance.GetPlayerProfile().GetName() };
+#if !API
+	public static PlayerReference fromRPC(ZRpc? rpc) => rpc is null ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.First(p => p.m_host == rpc.m_socket.GetHostName()));
+#endif
 
 	public string id;
 	public string name;

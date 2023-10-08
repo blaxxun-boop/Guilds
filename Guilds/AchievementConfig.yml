@@ -1,0 +1,36 @@
+Guild Boss Kills:
+  name: "We Take You All On!"
+  description: "Kill each boss once while at least {required members} guild members are nearby."
+  icon: "TakeOn.png"
+  level: [2]
+  config:
+    required members: 3
+
+Guild Boss Kills Timed:
+  name: "We Take You All On ... Simultaneously!"
+  description: "Kill all bosses within {maximum time between kills} seconds of each other."
+  icon: "TakeOnSim.png"
+  level: [5]
+  config:
+    maximum time between kills: 10
+
+Found Haldor:
+  name: "Found You!"
+  description: "Be the first to find Haldor the trader."
+  icon: "HaldorFound.png"
+  level: [1]
+  first: true
+
+Found Hildir:
+  name: "Try To Hide Better Next Time!"
+  description: "Be the first to find Hildir the trader."
+  icon: "HildirFound.png"
+  level: [1]
+  first: true
+
+Spend Coins:
+  name: "I Was A Business Man ... Doing Business."
+  description: "Spend coins at a trader."
+  icon: "SpendCoinsTrader.png"
+  progress: [1000, 5000, 25000]
+  level: [1, 1, 2]

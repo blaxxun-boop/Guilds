@@ -14,13 +14,18 @@ public static class Interface
 	internal static GameObject GuildManagementUIPrefab = null!;
 	internal static GameObject ApplicationsUIPrefab = null!;
 	internal static GameObject EditGuildUIPrefab = null!;
+	internal static GameObject AchievementUIPrefab = null!;
+	internal static GameObject AchievementPopupPrefab = null!;
 	internal static GameObject NoGuildUI = null!;
 	internal static GameObject SearchGuildUI = null!;
 	internal static GameObject CreateGuildUI = null!;
 	internal static GameObject GuildManagementUI = null!;
 	internal static GameObject ApplicationsUI = null!;
 	internal static GameObject EditGuildUI = null!;
+	internal static GameObject AchievementUI = null!;
+	internal static GameObject AchievementPopup = null!;
 	internal static readonly Dictionary<int, Sprite> GuildIcons = new();
+	internal static readonly Dictionary<string, Sprite> AchievementIcons = new();
 
 	internal static void LoadAssets()
 	{
@@ -31,12 +36,21 @@ public static class Interface
 		GuildManagementUIPrefab = assets.LoadAsset<GameObject>("GuildManagementUI");
 		ApplicationsUIPrefab = assets.LoadAsset<GameObject>("ApplicationsUI");
 		EditGuildUIPrefab = assets.LoadAsset<GameObject>("EditGuild");
+		AchievementUIPrefab = assets.LoadAsset<GameObject>("AchievementUI");
+		AchievementPopupPrefab = assets.LoadAsset<GameObject>("AchievementPopup");
 		assets.Unload(false);
 		
-		foreach (string s in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(name => name.StartsWith("Guilds.Icons.Badges", StringComparison.Ordinal)))
+		foreach (string s in Assembly.GetExecutingAssembly().GetManifestResourceNames())
 		{
-			string[] parts = s.Split('.');
-			GuildIcons.Add(int.Parse(parts[parts.Length - 2]), Tools.loadSprite(s.Replace("Guilds.Icons.", ""), 128, 128));
+			if (s.StartsWith("Guilds.Icons.Badges", StringComparison.Ordinal))
+			{
+				string[] parts = s.Split('.');
+				GuildIcons.Add(int.Parse(parts[parts.Length - 2]), Tools.loadSprite(s.Replace("Guilds.Icons.", ""), 128, 128));
+			}
+			else if (s.StartsWith("Guilds.Icons.Achievements", StringComparison.Ordinal))
+			{
+				AchievementIcons[s.Replace("Guilds.Icons.Achievements.", "")] = Tools.loadSprite(s.Replace("Guilds.Icons.", ""), 128, 128);
+			}
 		}
 	}
 
@@ -74,7 +88,7 @@ public static class Interface
 		}
 	}
 
-	internal static bool UIIsActive() => (NoGuildUI && NoGuildUI.activeSelf) || (CreateGuildUI && CreateGuildUI.activeSelf) || (SearchGuildUI && SearchGuildUI.activeSelf) || (GuildManagementUI && GuildManagementUI.activeSelf) || (ApplicationsUI && ApplicationsUI.activeSelf) || (EditGuildUI && EditGuildUI.activeSelf);
+	internal static bool UIIsActive() => (NoGuildUI && NoGuildUI.activeSelf) || (CreateGuildUI && CreateGuildUI.activeSelf) || (SearchGuildUI && SearchGuildUI.activeSelf) || (GuildManagementUI && GuildManagementUI.activeSelf) || (ApplicationsUI && ApplicationsUI.activeSelf) || (EditGuildUI && EditGuildUI.activeSelf) || (AchievementUI && AchievementUI.activeSelf);
 
 	internal static void HideUI()
 	{
@@ -84,6 +98,7 @@ public static class Interface
 		GuildManagementUI.SetActive(false);
 		ApplicationsUI.SetActive(false);
 		EditGuildUI.SetActive(false);
+		AchievementUI.SetActive(false);
 	}
 
 	internal static void SwitchUI(GameObject newUI, bool hideOld = true)

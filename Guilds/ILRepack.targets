@@ -7,6 +7,8 @@
             <InputAssemblies Include="$(OutputPath)YamlDotNet.dll" />
             <InputAssemblies Include="$(OutputPath)ServerSync.dll" />
             <InputAssemblies Include="$(OutputPath)LocalizationManager.dll" />
+            <InputAssemblies Include="$(OutputPath)StatManager.dll" />
+            <InputAssemblies Include="$(OutputPath)APIManager.dll" />
         </ItemGroup>
         <ItemGroup>
             <LibraryPaths Include="$(OutputPath)" />

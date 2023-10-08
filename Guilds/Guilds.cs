@@ -16,10 +16,12 @@ namespace Guilds;
 public class Guilds : BaseUnityPlugin
 {
 	private const string ModName = "Guilds";
-	private const string ModVersion = "1.0.1";
+	private const string ModVersion = "1.1.0";
 	private const string ModGUID = "org.bepinex.plugins.guilds";
 
 	public static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
+
+	internal static Guilds self = null!;
 
 	public static string GuildsPath = null!;
 
@@ -46,9 +48,20 @@ public class Guilds : BaseUnityPlugin
 	internal static ConfigEntry<uint> maximumGuildMembers = null!;
 	internal static ConfigEntry<Toggle> allowGuildCreation = null!;
 	internal static ConfigEntry<KeyboardShortcut> guildPingHotkey = null!;
-
+	internal static ConfigEntry<GuildAchievements> guildAchievementConfig = null!;
+	
+	internal enum GuildAchievements
+	{
+		Disabled = 0,
+		Default = 1,
+		External = 2,
+	}
+	
 	public void Awake()
 	{
+		self = this;
+	
+		APIManager.Patcher.Patch();
 		Localizer.Load();
 
 		GuildsPath = Utils.GetSaveDataPath(FileHelpers.FileSource.Local) + Path.DirectorySeparatorChar + "Guilds";
@@ -79,6 +92,7 @@ public class Guilds : BaseUnityPlugin
 		allowGuildCreation = config("1 - General", "Allow Guild Creation", Toggle.On, new ConfigDescription("If off, only admins can create new guilds."));
 		guildPingHotkey = config("1 - General", "Guild Ping Modifier Key", new KeyboardShortcut(KeyCode.LeftShift), new ConfigDescription("Modifier key that has to be pressed while pinging the map, to make the map ping visible to guild members only."), false);
 		maximumGuildMembers = config("1 - General", "Maximum Guild Members", 0U, new ConfigDescription("Maximum number of guild members per guild. Set to 0 for no maximum."));
+		guildAchievementConfig = config("2 - Achievements", "Ignore Internal Achievement Config", GuildAchievements.Default, new ConfigDescription("Disabled: Guild achievements are disabled and not available on your server.\nDefault: The internal guild achievement config is enabled and can be adjusted via an optional external AchievementConfig.yml file.\nExternal: The internal guild achievement configs are ignored and guild achievements are parsed from an external AchievementConfig.yml file only. This means that you have to keep track of newly added achievements yourself and add them to your config file, if you want to have them on your server."));
 
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Harmony harmony = new(ModGUID);
@@ -86,6 +100,7 @@ public class Guilds : BaseUnityPlugin
 
 		Interface.LoadAssets();
 		Map.Init();
+		Achievements.Init();
 
 		InvokeRepeating(nameof(updatePositon), 0, 2);
 	}
@@ -110,7 +125,7 @@ public class Guilds : BaseUnityPlugin
 
 	public void Update() => Interface.Update();
 
-	private static void addFileWatchEvent(FileSystemWatcher watcher, Action<object, EventArgs> handler)
+	internal static void addFileWatchEvent(FileSystemWatcher watcher, Action<object, EventArgs> handler)
 	{
 		watcher.Created += new FileSystemEventHandler(handler);
 		watcher.Changed += new FileSystemEventHandler(handler);

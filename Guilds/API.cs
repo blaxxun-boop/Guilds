@@ -240,4 +240,49 @@ public static class API
 		guild.customData.data[typeof(T)] = customData;
 #endif
 	}
+
+	public static void IncreaseAchievementProgress(Guild guild, string achievement, float increment = 1f)
+	{
+#if !API
+		if (guild.Achievements.TryGetValue(achievement, out AchievementData data) && data.progress is null)
+		{
+			return;
+		}
+		GuildList.increaseAchievement(guild.General.id, achievement, increment);
+#endif
+	}
+
+	public delegate void AchievementCompleted(PlayerReference player, string achievment);
+	public static void RegisterOnAchievementCompleted(AchievementCompleted callback)
+	{
+#if !API
+		Achievements.achievementCompletedCallbacks.Add(callback);
+#endif
+	}
+
+	public static void RegisterAchievement(string name, AchievementConfig config)
+	{
+#if !API
+		Achievements.dynamicAchievementConfigs.Add(name, config);
+#endif
+	}
+	
+	internal static AchievementConfig? GetAchievementConfig(string achievement)
+	{
+#if ! API
+		return Achievements.GetAchievementConfig(achievement);
+#else
+		return null;
+#endif
+	}
+
+	internal static IEnumerable<KeyValuePair<string, AchievementConfig>> AllAchievementConfigs()
+	{
+#if ! API
+		return Achievements.AllAchievementConfigs();
+#else
+		return Array.Empty<KeyValuePair<string, AchievementConfig>>();
+#endif
+	}
 }
+

@@ -44,16 +44,6 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'APIStub|AnyCPU' ">
-        <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-        <AssemblyName>GuildsAPI</AssemblyName>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\APIStub\</OutputPath>
-        <DefineConstants>APIStub;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
     <Choose>
         <When Condition="($(OS) == 'Unix' OR $(OS) == 'OSX') AND $(GamePath) == ''">
             <PropertyGroup>
@@ -77,6 +67,9 @@
             <SpecificVersion>false</SpecificVersion>
             <Private>false</Private>
         </Reference>
+        <Reference Include="APIManager">
+            <HintPath>Libs\APIManager.dll</HintPath>
+        </Reference>
         <Reference Include="assembly_guiutils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
             <Private>false</Private>
@@ -97,17 +90,26 @@
         <Reference Include="LocalizationManager">
             <HintPath>Libs\LocalizationManager.dll</HintPath>
         </Reference>
-        <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+        <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
             <HintPath>Libs\ServerSync.dll</HintPath>
         </Reference>
+        <Reference Include="StatManager">
+            <HintPath>Libs\StatManager.dll</HintPath>
+        </Reference>
         <Reference Include="ui_lib">
-          <HintPath>$(GamePath)\valheim_Data\Managed\ui_lib.dll</HintPath>
+            <HintPath>$(GamePath)\valheim_Data\Managed\ui_lib.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
-            <HintPath>$(GamePath)\unstripped_corlib\Unity.TextMeshPro.dll</HintPath>
+            <HintPath>$(GamePath)\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AnimationModule">
+            <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.AnimationModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -131,40 +133,46 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
-          <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.ImageConversionModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-          <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.InputLegacyModule.dll</HintPath>
+            <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UIModule">
-          <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.UIModule.dll</HintPath>
+            <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.UIModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e">
             <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
-            <Private>True</Private>
+            <Private>true</Private>
         </Reference>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'APIStub|AnyCPU' ">
-        <Compile Include="AssemblyResolver.cs"/>
-        <EmbeddedResource Include="bin\API\Guilds.dll" Link="Guilds.dll"/>
-    </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup>
         <Compile Include="API.cs"/>
         <Compile Include="API.Structures.cs"/>
         <Compile Include="Enums.cs"/>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
+        <Compile Include="AchievementStorage.cs"/>
+        <Compile Include="Achievements.cs"/>
+        <Compile Include="AchievementTracker.cs"/>
+        <Compile Include="assets\AchievementPopup.cs"/>
+        <Compile Include="assets\AchievementUI.cs"/>
+        <Compile Include="assets\AchievementUIRow.cs"/>
         <Compile Include="assets\ApplicationsUI.cs"/>
         <Compile Include="assets\ApplicationsUIRow.cs"/>
         <Compile Include="assets\ApplyUI.cs"/>
         <Compile Include="assets\CreateGuildUI.cs"/>
-        <Compile Include="assets\EditGuildUI.cs" />
-        <Compile Include="assets\GuildColorPicker.cs" />
+        <Compile Include="assets\EditGuildUI.cs"/>
+        <Compile Include="assets\GuildColorPicker.cs"/>
         <Compile Include="assets\GuildIconElement.cs"/>
         <Compile Include="assets\GuildIconUI.cs"/>
         <Compile Include="assets\GuildManagementUI.cs"/>
@@ -172,35 +180,44 @@
         <Compile Include="assets\NoGuildUI.cs"/>
         <Compile Include="assets\SearchGuildUI.cs"/>
         <Compile Include="assets\SearchGuildUIRow.cs"/>
-        <Compile Include="GuildChat.cs" />
-        <Compile Include="Map.cs" />
+        <Compile Include="GuildChat.cs"/>
+        <Compile Include="Map.cs"/>
         <Compile Include="Guilds.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="GuildConfig.cs"/>
         <Compile Include="GuildList.cs"/>
         <Compile Include="ObjectDiff.cs"/>
-        <Compile Include="Interface.cs" />
+        <Compile Include="Interface.cs"/>
         <Compile Include="ZDOIDYamlConverter.cs"/>
         <Compile Include="Patches.cs"/>
         <Compile Include="Tools.cs"/>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Content Include="ILRepack.targets"/>
         <Content Include="Libs\ServerSync.dll"/>
-        <Content Include="Libs\LocalizationManager.dll" />
+        <Content Include="Libs\LocalizationManager.dll"/>
+        <Content Include="Libs\APIManager.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Libs\StatManager.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <None Include="packages.config"/>
     </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
+        <EmbeddedResource Include="AchievementConfig.yml"/>
         <EmbeddedResource Include="assets\guildsbundle"/>
         <EmbeddedResource Include="Icons\Badges\*.png"/>
-        <EmbeddedResource Include="Icons\guildMapPingIcon.png" />
-        <EmbeddedResource Include="Icons\guildPlayerIcon.png" />
+        <EmbeddedResource Include="Icons\guildMapPingIcon.png"/>
+        <EmbeddedResource Include="Icons\guildPlayerIcon.png"/>
         <EmbeddedResource Include="translations\English.yml"/>
+        <EmbeddedResource Include="translations\French.yml"/>
+        <EmbeddedResource Include="Icons\Achievements\*.png"/>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets') and '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' "/>
+    <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets') and '$(Configuration)|$(Platform)' != 'API|AnyCPU' "/>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
         <PropertyGroup>
             <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
@@ -214,7 +231,10 @@
     <Target Name="AfterBuild">
     </Target>
     -->
-    <Target Name="Copy" AfterTargets="ILRepack" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' and '$(Configuration)|$(Platform)' != 'APIStub|AnyCPU' ">
+    <Target Name="Copy" AfterTargets="ILRepack" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(GamePath)\BepInEx\plugins\$(AssemblyName).dll&quot;"/>
+    </Target>
+    <Target Name="Move" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)' == 'API|AnyCPU'">
+        <Exec Command="move &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(TargetDir)$(AssemblyName)API.dll&quot;"/>
     </Target>
 </Project>

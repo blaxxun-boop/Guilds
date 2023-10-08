@@ -92,12 +92,16 @@ public static class Patches
 			Interface.GuildManagementUIPrefab.SetActive(false);
 			Interface.ApplicationsUIPrefab.SetActive(false);
 			Interface.EditGuildUIPrefab.SetActive(false);
+			Interface.AchievementUIPrefab.SetActive(false);
+			Interface.AchievementPopupPrefab.SetActive(false);
 			Interface.NoGuildUI = Object.Instantiate(Interface.NoGuildUIPrefab, transform, false);
 			Interface.SearchGuildUI = Object.Instantiate(Interface.SearchGuildUIPrefab, transform, false);
 			Interface.CreateGuildUI = Object.Instantiate(Interface.CreateGuildUIPrefab, transform, false);
 			Interface.GuildManagementUI = Object.Instantiate(Interface.GuildManagementUIPrefab, transform, false);
 			Interface.ApplicationsUI = Object.Instantiate(Interface.ApplicationsUIPrefab, transform, false);
 			Interface.EditGuildUI = Object.Instantiate(Interface.EditGuildUIPrefab, transform, false);
+			Interface.AchievementUI = Object.Instantiate(Interface.AchievementUIPrefab, transform, false);
+			Interface.AchievementPopup = Object.Instantiate(Interface.AchievementPopupPrefab, transform, false);
 
 			UnifiedPopup.instance.transform.SetAsLastSibling();
 		}
