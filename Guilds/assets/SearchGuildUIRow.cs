@@ -57,7 +57,7 @@ namespace Guilds
 			this.applyUI = applyUI;
 			leaderText.text = Localization.instance.Localize("$guilds_rank_leader: ") + API.GetGuildLeader(guild).name;
 			nameText.text = guild.Name;
-			guildIconImg.sprite = Interface.GuildIcons.TryGetValue(guild.General.icon, out Sprite sprite) ? sprite : Interface.GuildIcons[1];
+			guildIconImg.sprite = API.GetGuildIcon(guild);
 			levelText.text = Localization.instance.Localize("$guilds_level ") + guild.General.level;
 			rightColumnInputField.text = guild.General.description;
 		}

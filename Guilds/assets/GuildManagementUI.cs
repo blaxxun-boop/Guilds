@@ -206,6 +206,11 @@ namespace Guilds
 
 		public void ButtonEditGuildClicked()
 		{
+			if (Guilds.allowGuildEdit.Value == Toggle.Off && !Guilds.configSync.IsAdmin)
+			{
+				UnifiedPopup.Push(new WarningPopup("$guilds_edit_disabled", "$guilds_edit_disabled_details", UnifiedPopup.Pop));
+				return;
+			}
 			Interface.SwitchUI(Interface.EditGuildUI);
 		}
 

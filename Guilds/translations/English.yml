@@ -94,6 +94,8 @@ guilds_creation_admin_only: "Admin only"
 guilds_creation_admin_only_details: "The servers configuration only allows admins to create new guilds."
 guilds_guild_full: "Guild full"
 guilds_guild_full_details: "Your guild has reached the maximum number of members. You cannot accept new members into the guild."
+guilds_edit_disabled: "No Permission"
+guilds_edit_disabled_details: "The current configuration allows only admins to edit guilds."
 
 # Other
 guilds_application_accepted: "You have been accepted into the guild $1!"

@@ -16,7 +16,7 @@ namespace Guilds;
 public class Guilds : BaseUnityPlugin
 {
 	private const string ModName = "Guilds";
-	private const string ModVersion = "1.1.0";
+	private const string ModVersion = "1.1.1";
 	private const string ModGUID = "org.bepinex.plugins.guilds";
 
 	public static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -47,6 +47,7 @@ public class Guilds : BaseUnityPlugin
 	internal static ConfigEntry<int> maximumGuildNameLength = null!;
 	internal static ConfigEntry<uint> maximumGuildMembers = null!;
 	internal static ConfigEntry<Toggle> allowGuildCreation = null!;
+	internal static ConfigEntry<Toggle> allowGuildEdit = null!;
 	internal static ConfigEntry<KeyboardShortcut> guildPingHotkey = null!;
 	internal static ConfigEntry<GuildAchievements> guildAchievementConfig = null!;
 	
@@ -90,6 +91,7 @@ public class Guilds : BaseUnityPlugin
 			}
 		};
 		allowGuildCreation = config("1 - General", "Allow Guild Creation", Toggle.On, new ConfigDescription("If off, only admins can create new guilds."));
+		allowGuildEdit = config("1 - General", "Allow Guild Edit", Toggle.On, new ConfigDescription("If off, only admins can edit guilds."));
 		guildPingHotkey = config("1 - General", "Guild Ping Modifier Key", new KeyboardShortcut(KeyCode.LeftShift), new ConfigDescription("Modifier key that has to be pressed while pinging the map, to make the map ping visible to guild members only."), false);
 		maximumGuildMembers = config("1 - General", "Maximum Guild Members", 0U, new ConfigDescription("Maximum number of guild members per guild. Set to 0 for no maximum."));
 		guildAchievementConfig = config("2 - Achievements", "Ignore Internal Achievement Config", GuildAchievements.Default, new ConfigDescription("Disabled: Guild achievements are disabled and not available on your server.\nDefault: The internal guild achievement config is enabled and can be adjusted via an optional external AchievementConfig.yml file.\nExternal: The internal guild achievement configs are ignored and guild achievements are parsed from an external AchievementConfig.yml file only. This means that you have to keep track of newly added achievements yourself and add them to your config file, if you want to have them on your server."));

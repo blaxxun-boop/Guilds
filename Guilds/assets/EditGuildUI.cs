@@ -93,7 +93,7 @@ namespace Guilds
 			Guild guild = API.GetOwnGuild()!;
 			Col2InputFieldGuildName.text = guild.Name;
 			Col2InputFieldGuildDescription.text = guild.General.description;
-			Col1IconContainerIcon.sprite = Interface.GuildIcons.TryGetValue(guild.General.icon, out Sprite icon) ? icon : Interface.GuildIcons[1];
+			Col1IconContainerIcon.sprite = API.GetGuildIcon(guild);
 			guildIconId = guild.General.icon;
 			guildsColorPickerInstance.chosenColor = guild.General.color;
 			if (ColorUtility.TryParseHtmlString(guildsColorPickerInstance.chosenColor, out Color color))

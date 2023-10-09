@@ -11,7 +11,7 @@ namespace Guilds
 	{
 		private PlayerReference applicant;
 		private Application application = null!;
-		private Guild guild = null!;
+		private int guildId = -1;
 
 		[Header("Row Root")]
 		public RectTransform rowRootTransform = null!;
@@ -65,11 +65,16 @@ namespace Guilds
 			whyMeAreaText.text = application.description;
 			statusText.text = Localization.instance.Localize("$guilds_apply_applied", Tools.GetHumanFriendlyTime((int)(DateTime.Now - application.applied).TotalSeconds));
 
-			guild = API.GetOwnGuild()!;
+			guildId = API.GetOwnGuild()!.General.id;
 		}
 
 		public void OnDenyMember_ButtonClicked()
 		{
+			if (API.GetGuild(guildId) is not { } guild)
+			{
+				return;
+			}
+
 			API.RemovePlayerApplication(applicant, guild);
 			
 			Guilds.SendMessageToPlayer(applicant, Localization.instance.Localize("$guilds_application_declined", guild.Name));
@@ -77,6 +82,11 @@ namespace Guilds
 
 		public void OnAcceptMember_ButtonClicked()
 		{
+			if (API.GetGuild(guildId) is not { } guild)
+			{
+				return;
+			}
+
 			if (Guilds.maximumGuildMembers.Value > 0 && guild.Members.Count >= Guilds.maximumGuildMembers.Value)
 			{
 				UnifiedPopup.Push(new WarningPopup("$guilds_guild_full", "$guilds_guild_full_details", (PopupButtonCallback)UnifiedPopup.Pop));
@@ -84,6 +94,12 @@ namespace Guilds
 			}
 			
 			API.RemovePlayerApplication(applicant, guild);
+			guild = API.GetGuild(guildId);
+			if (guild is null)
+			{
+				return;
+			}
+
 			API.AddPlayerToGuild(applicant, guild);
 
 			Guilds.SendMessageToPlayer(applicant, Localization.instance.Localize("$guilds_application_accepted", guild.Name));

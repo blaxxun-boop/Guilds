@@ -18,14 +18,18 @@ internal static class GuildList
 	private static int changeCount = 0;
 	private static bool GuildIOActive = false;
 	public static readonly Dictionary<string, Guild> guildList = new();
-	public static readonly Dictionary<int, Guild> guildsById = new();
+	public static Dictionary<int, Guild> guildsById = new();
 	private static readonly Dictionary<string, Guild> guildBackup = new();
 	private static HashSet<int> guildsWithPendingChanges = new();
+	private static bool truthSource = false;
 
 	public static void Init()
 	{
 		guildEntries.ValueChanged += () =>
 		{
+			bool signalAPIUpdates = truthSource == Guilds.configSync.IsSourceOfTruth;
+			truthSource = Guilds.configSync.IsSourceOfTruth;
+
 			HashSet<string> guildsToWrite = new();
 			bool wasGuildIOActive = GuildIOActive;
 			GuildIOActive = true;
@@ -46,7 +50,8 @@ internal static class GuildList
 
 			//Debug.Log($"VALCHANGED: update from BACKUP\n{new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).WithTypeConverter(new ZDOIDYamlConverter()).Build().Serialize(guildBackup)} and LIST {new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).WithTypeConverter(new ZDOIDYamlConverter()).Build().Serialize(guildList)}");
 
-			guildsById.Clear();
+			Dictionary<int, Guild> oldGuilds = guildsById;
+			guildsById = new Dictionary<int, Guild>();
 			guildList.Clear();
 			guildBackup.Clear();
 			foreach (KeyValuePair<string, string> syncedEntry in guildEntries.Value)
@@ -79,6 +84,24 @@ internal static class GuildList
 						guildList.Add(syncedEntry.Key, guild);
 						guildBackup.Add(syncedEntry.Key, guildCopy);
 
+						if (signalAPIUpdates)
+						{
+							if (!oldGuilds.TryGetValue(guild.General.id, out Guild oldGuild))
+							{
+								API.InvokeGuildCreated(guild);
+							}
+
+							HashSet<PlayerReference> oldMembers = new(oldGuild?.Members.Keys ?? Enumerable.Empty<PlayerReference>());
+							foreach (PlayerReference joined in guild.Members.Keys.Except(oldMembers))
+							{
+								API.InvokeGuildJoined(guild, joined);
+							}
+							foreach (PlayerReference left in oldMembers.Except(guild.Members.Keys))
+							{
+								API.InvokeGuildLeft(guild, left);
+							}
+						}
+
 						if (!wasGuildIOActive && guildsToWrite.Contains(syncedEntry.Key))
 						{
 							File.WriteAllText(Guilds.GuildsPath + Path.DirectorySeparatorChar + syncedEntry.Key + ".yml", GuildSerialization.Serialize(GuildConfigSerialized.fromGuildConfig(guild)));
@@ -88,6 +111,21 @@ internal static class GuildList
 				catch (Exception e)
 				{
 					Debug.LogError($"Failed to deserialize internally transferred guild file {syncedEntry.Key}: {e}");
+				}
+			}
+
+			if (signalAPIUpdates)
+			{
+				foreach (KeyValuePair<int, Guild> kv in oldGuilds)
+				{
+					if (!guildsById.ContainsKey(kv.Key))
+					{
+						foreach (PlayerReference player in kv.Value.Members.Keys)
+						{
+							API.InvokeGuildLeft(kv.Value, player);
+						}
+						API.InvokeGuildDeleted(kv.Value);
+					}
 				}
 			}
 
@@ -232,10 +270,19 @@ internal static class GuildList
 			}
 
 			Guild guild = guildList[guildName];
+			HashSet<PlayerReference> oldMembers = new(guild.Members.Keys);
 			//Debug.Log($"guild server pre apply state\n{GuildSerialization.Serialize(guild)}");
 			ObjectDiff.ApplyDiff(ref guild, differences);
 			//Debug.Log($"guild server post apply state\n{GuildSerialization.Serialize(guild)}");
 			guildList[guildName] = guild;
+			foreach (PlayerReference joined in guild.Members.Keys.Except(oldMembers))
+			{
+				API.InvokeGuildJoined(guild, joined);
+			}
+			foreach (PlayerReference left in oldMembers.Except(guild.Members.Keys))
+			{
+				API.InvokeGuildLeft(guild, left);
+			}
 
 			WriteGuild(guildName);
 
@@ -280,7 +327,7 @@ internal static class GuildList
 			string achievement = package.ReadString();
 			float increment = package.ReadSingle();
 
-			if (guildsById.TryGetValue(guildId, out Guild guild) && Achievements.GetAchievementConfig(achievement) is {} config)
+			if (guildsById.TryGetValue(guildId, out Guild guild) && Achievements.GetAchievementConfig(achievement) is { } config)
 			{
 				if (!guild.Achievements.TryGetValue(achievement, out AchievementData data))
 				{
@@ -317,10 +364,10 @@ internal static class GuildList
 							peer.m_rpc.Invoke("Guild Achievement Completed", player.name, player.id, achievement);
 						}
 						CompletedAchievement(null, player.name, player.id, achievement);
-						
+
 						return;
 					}
-					
+
 					DelayedGuildUpdate(guildId);
 				}
 			}
@@ -347,7 +394,6 @@ internal static class GuildList
 	{
 		if (guildsById.TryGetValue(guildId, out Guild guild))
 		{
-			
 			WriteGuild(guild.Name);
 		}
 	}
@@ -464,11 +510,11 @@ internal static class GuildList
 
 	public static void increaseAchievement(int guildId, string achievement, float increment)
 	{
-		if (Achievements.GetAchievementConfig(achievement) is not { } config || (config.guild is {} guilds && !guilds.Contains(guildId)))
+		if (Achievements.GetAchievementConfig(achievement) is not { } config || (config.guild is { } guilds && !guilds.Contains(guildId)))
 		{
 			return;
 		}
-		
+
 		ZPackage zpkg = new();
 		zpkg.Write(guildId);
 		zpkg.Write(achievement);

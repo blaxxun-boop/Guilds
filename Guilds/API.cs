@@ -5,6 +5,7 @@ using BepInEx;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Guilds;
 
@@ -134,7 +135,9 @@ public static class API
 		{
 			guild.Members.Add(player, new GuildMember());
 			SaveGuild(guild);
-
+#if ! API
+			InvokeGuildJoined(guild, player);
+#endif
 			return true;
 		}
 
@@ -147,7 +150,9 @@ public static class API
 		{
 			guild.Members.Remove(player);
 			SaveGuild(guild);
-
+#if ! API
+			InvokeGuildLeft(guild, player);
+#endif
 			return true;
 		}
 
@@ -166,6 +171,7 @@ public static class API
 			GuildMember member = guild.Members[player];
 			member.rank = newRank;
 			guild.Members[player] = member;
+			SaveGuild(guild);
 
 			return true;
 		}
@@ -253,6 +259,7 @@ public static class API
 	}
 
 	public delegate void AchievementCompleted(PlayerReference player, string achievment);
+
 	public static void RegisterOnAchievementCompleted(AchievementCompleted callback)
 	{
 #if !API
@@ -262,11 +269,11 @@ public static class API
 
 	public static void RegisterAchievement(string name, AchievementConfig config)
 	{
-#if !API
+#if ! API
 		Achievements.dynamicAchievementConfigs.Add(name, config);
 #endif
 	}
-	
+
 	internal static AchievementConfig? GetAchievementConfig(string achievement)
 	{
 #if ! API
@@ -284,5 +291,78 @@ public static class API
 		return Array.Empty<KeyValuePair<string, AchievementConfig>>();
 #endif
 	}
-}
 
+	public static Sprite? GetGuildIcon(Guild guild)
+	{
+#if ! API
+		return Interface.GuildIcons.TryGetValue(guild.General.icon, out Sprite icon) ? icon : Interface.GuildIcons[1];
+#else
+		return null;
+#endif
+	}
+
+	public static Sprite? GetGuildIconById(int iconId)
+	{
+#if ! API
+		return Interface.GuildIcons.TryGetValue(iconId, out Sprite icon) ? icon : Interface.GuildIcons[1];
+#else
+		return null;
+#endif
+	}
+
+	public static int GetAchievementStage(Guild guild, AchievementConfig achievement)
+	{
+#if ! API
+		if (guild.Achievements.TryGetValue(achievement.name, out AchievementData data))
+		{
+			return data.completed.Count;
+		}
+#endif
+		return 0;
+	}
+
+	public delegate void GuildJoined(Guild guild, PlayerReference player);
+	public delegate void GuildLeft(Guild guild, PlayerReference player);
+	public delegate void GuildCreated(Guild guild);
+	public delegate void GuildDeleted(Guild guild);
+
+	public static void RegisterOnGuildJoined(GuildJoined callback)
+    {
+#if ! API
+        OnGuildJoined.Add(callback);
+#endif
+	}
+	
+	public static void RegisterOnGuildLeft(GuildLeft callback)
+    {
+#if ! API
+        OnGuildLeft.Add(callback);
+#endif
+	}
+	
+	public static void RegisterOnGuildCreated(GuildCreated callback)
+    {
+#if ! API
+        OnGuildCreated.Add(callback);
+#endif
+	}
+	
+	public static void RegisterOnGuildDeleted(GuildDeleted callback)
+    {
+#if ! API
+        OnGuildDeleted.Add(callback);
+#endif
+	}
+
+#if ! API
+	public static List<GuildJoined> OnGuildJoined = new();
+	public static List<GuildLeft> OnGuildLeft = new();
+	public static List<GuildCreated> OnGuildCreated = new();
+	public static List<GuildDeleted> OnGuildDeleted = new();
+
+	internal static void InvokeGuildJoined(Guild guild, PlayerReference player) => OnGuildJoined.ForEach(cb => cb(guild, player));
+	internal static void InvokeGuildLeft(Guild guild, PlayerReference player) => OnGuildLeft.ForEach(cb => cb(guild, player));
+	internal static void InvokeGuildCreated(Guild guild) => OnGuildCreated.ForEach(cb => cb(guild));
+	internal static void InvokeGuildDeleted(Guild guild) => OnGuildDeleted.ForEach(cb => cb(guild));
+#endif
+}
