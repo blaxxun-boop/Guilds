@@ -38,7 +38,7 @@ public static class GuildChat
 
 					foreach (ZNet.PlayerInfo player in ZNet.instance.m_players)
 					{
-						if (guild.Members.ContainsKey(PlayerReference.fromPlayerInfo(player)))
+						if (player.m_characterID.UserID != 0 && guild.Members.ContainsKey(PlayerReference.fromPlayerInfo(player)))
 						{
 							ZRoutedRpc.instance.InvokeRoutedRPC(player.m_characterID.UserID, "Guilds ChatMessage", UserInfo.GetLocalUser(), message);
 						}
@@ -46,13 +46,13 @@ public static class GuildChat
 				}
 				else
 				{
-					ToggleGroupsChat(!guildChatActive);
+					ToggleGuildsChat(!guildChatActive);
 				}
 			}));
 		}
 	}
 
-	public static void ToggleGroupsChat(bool active)
+	public static void ToggleGuildsChat(bool active)
 	{
 		if (Chat.instance)
 		{
@@ -60,10 +60,12 @@ public static class GuildChat
 			if (active)
 			{
 				placeholder.text = guildChatPlaceholder;
+				Localization.instance.textMeshStrings[placeholder] = guildChatPlaceholder;
 			}
 			else if (placeholder.text == guildChatPlaceholder)
 			{
 				placeholder.text = Localization.instance.Localize("$chat_entertext");
+				Localization.instance.textMeshStrings[placeholder] = "$chat_entertext";
 			}
 		}
 	}

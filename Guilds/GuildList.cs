@@ -147,7 +147,7 @@ internal static class GuildList
 				}
 				else
 				{
-					GuildChat.ToggleGroupsChat(false);
+					GuildChat.ToggleGuildsChat(false);
 				}
 			}
 		};

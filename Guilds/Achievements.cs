@@ -53,14 +53,14 @@ public static class Achievements
 			{
 				Debug.LogError($"Failed to deserialize achievementConfig: {e}");
 			}
-		};
+		}
 
 		readAchievementConfigFile();
 		Guilds.addFileWatchEvent(new FileSystemWatcher(Path.GetDirectoryName(achievementConfigPath)!, Path.GetFileName(achievementConfigPath)), (_, _) => readAchievementConfigFile());
 
 		API.RegisterOnAchievementCompleted((player, achievement) =>
 		{
-			if (GetAchievementConfig(achievement) is { } config && API.GetOwnGuild() is { } guild && guild.Achievements.TryGetValue(achievement, out AchievementData data))
+			if (GetAchievementConfig(achievement) is { } config && API.GetOwnGuild() is { } guild && guild.Members.ContainsKey(player) && guild.Achievements.TryGetValue(achievement, out AchievementData data))
 			{
 				AchievementPopup.Queue(player, config, data.completed.Count);
 			}
