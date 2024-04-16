@@ -16,7 +16,7 @@ namespace Guilds;
 public class Guilds : BaseUnityPlugin
 {
 	private const string ModName = "Guilds";
-	private const string ModVersion = "1.1.6";
+	private const string ModVersion = "1.1.7";
 	private const string ModGUID = "org.bepinex.plugins.guilds";
 
 	public static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -50,18 +50,18 @@ public class Guilds : BaseUnityPlugin
 	internal static ConfigEntry<Toggle> allowGuildEdit = null!;
 	internal static ConfigEntry<KeyboardShortcut> guildPingHotkey = null!;
 	internal static ConfigEntry<GuildAchievements> guildAchievementConfig = null!;
-	
+
 	internal enum GuildAchievements
 	{
 		Disabled = 0,
 		Default = 1,
 		External = 2,
 	}
-	
+
 	public void Awake()
 	{
 		self = this;
-	
+
 		APIManager.Patcher.Patch();
 		Localizer.Load();
 
@@ -159,7 +159,7 @@ public class Guilds : BaseUnityPlugin
 	{
 		ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, "Guilds PlayerMessage", message);
 	}
-	
+
 	private void updatePositon()
 	{
 		if (Player.m_localPlayer is { } ownPlayer && API.GetOwnGuild() is { } guild && !ZNet.instance.m_publicReferencePosition)

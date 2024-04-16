@@ -87,6 +87,9 @@
             <SpecificVersion>false</SpecificVersion>
             <Private>false</Private>
         </Reference>
+        <Reference Include="gui_framework">
+          <HintPath>$(GamePath)\valheim_Data\Managed\gui_framework.dll</HintPath>
+        </Reference>
         <Reference Include="LocalizationManager">
             <HintPath>Libs\LocalizationManager.dll</HintPath>
         </Reference>
@@ -95,10 +98,6 @@
         </Reference>
         <Reference Include="StatManager">
             <HintPath>Libs\StatManager.dll</HintPath>
-        </Reference>
-        <Reference Include="ui_lib">
-            <HintPath>$(GamePath)\valheim_Data\Managed\ui_lib.dll</HintPath>
-            <Private>false</Private>
         </Reference>
         <Reference Include="Unity.TextMeshPro">
             <HintPath>$(GamePath)\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
@@ -215,6 +214,9 @@
         <EmbeddedResource Include="translations\English.yml"/>
         <EmbeddedResource Include="translations\French.yml"/>
         <EmbeddedResource Include="Icons\Achievements\*.png"/>
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="translations\Portuguese_Brazilian.yml" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets') and '$(Configuration)|$(Platform)' != 'API|AnyCPU' "/>
