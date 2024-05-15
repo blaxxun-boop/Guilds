@@ -7,7 +7,7 @@ namespace Guilds;
 
 public static class AchievementTracker
 {
-	private static readonly List<string> bosses = new() { "Eikthyr", "gd_king", "Bonemass", "Dragon", "GoblinKing", "SeekerQueen" };
+	private static readonly List<string> bosses = new() { "Eikthyr", "gd_king", "Bonemass", "Dragon", "GoblinKing", "SeekerQueen", "Fader" };
 
 	[HarmonyPatch(typeof(Character), nameof(Character.OnDeath))]
 	public static class TrackBossKills

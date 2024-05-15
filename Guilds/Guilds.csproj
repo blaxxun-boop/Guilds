@@ -35,7 +35,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'API|AnyCPU' ">
-        <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <AssemblyName>Guilds</AssemblyName>
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
@@ -138,6 +138,9 @@
         <Reference Include="UnityEngine.InputLegacyModule">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+          <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>

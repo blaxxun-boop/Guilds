@@ -12,7 +12,7 @@
         </ItemGroup>
         <ItemGroup>
             <LibraryPaths Include="$(OutputPath)" />
-            <LibraryPaths Include="$(GamePath)\unstripped_corlib" />
+            <LibraryPaths Include="$(GamePath)\valheim_Data\Managed" />
             <LibraryPaths Include="$(GamePath)\BepInEx\core" />
         </ItemGroup>
         <ILRepack Parallel="true" DebugInfo="true" Internalize="true" InputAssemblies="@(InputAssemblies)"

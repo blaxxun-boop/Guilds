@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -12,20 +13,86 @@ namespace Guilds;
 
 public static class Patches
 {
+	private const short IsFriendlyAoe = -23749;
+
+	[HarmonyPatch(typeof(Aoe), nameof(Aoe.OnHit))]
+	private static class TagFriendlyFireAoe
+	{
+		private static HitData CheckAndTag(HitData hit, Aoe aoe)
+		{
+			if (aoe.m_hitFriendly && Projectile.FindHitObject(hit.m_hitCollider).GetComponent<Player>())
+			{
+				hit.m_weakSpot = IsFriendlyAoe;
+			}
+			return hit;
+		}
+
+		private static readonly MethodInfo ModifyHit = AccessTools.DeclaredMethod(typeof(HitData.DamageTypes), nameof(HitData.DamageTypes.Modify), new []{ typeof(float) });
+		private static readonly MethodInfo Damage = AccessTools.DeclaredMethod(typeof(IDestructible), nameof(IDestructible.Damage));
+
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			bool preDamage = false;
+			foreach (CodeInstruction instruction in instructions)
+			{
+				if (preDamage && instruction.Calls(Damage))
+				{
+					preDamage = false;
+					yield return new CodeInstruction(OpCodes.Ldarg_0);
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(TagFriendlyFireAoe), nameof(CheckAndTag)));
+				}
+				else if (instruction.Calls(ModifyHit))
+				{
+					preDamage = true;
+				}
+				yield return instruction;
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(Character), nameof(Character.RPC_Damage))]
 	public class FriendlyFirePatch
 	{
 		private static bool Prefix(Character __instance, HitData hit)
 		{
-			if (__instance is Player target && hit.GetAttacker() is Player attacker && hit.m_statusEffectHash != "Staff_shield".GetStableHashCode())
+			if (__instance == Player.m_localPlayer && hit.GetAttacker() is Player attacker && hit.m_weakSpot != IsFriendlyAoe)
 			{
-				if (API.GetPlayerGuild(target) is { } guild && guild.Name == API.GetPlayerGuild(attacker)?.Name && Guilds.friendlyFire.Value == Toggle.Off)
+				if (API.GetOwnGuild() is { } guild && guild.Name == API.GetPlayerGuild(attacker)?.Name && Guilds.friendlyFire.Value == Toggle.Off)
 				{
 					return false;
 				}
 			}
 
 			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(Character), nameof(Character.Damage))]
+	private static class PreventFriendlyFireMarkerOverwrite
+	{
+		private static void WriteWeakSpot(HitData hit, short index)
+		{
+			if (hit.m_weakSpot >= -1)
+			{
+				hit.m_weakSpot = index;
+			}
+		}
+
+		private static readonly FieldInfo weakSpotField = AccessTools.DeclaredField(typeof(HitData), nameof(HitData.m_weakSpot));
+
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			foreach (CodeInstruction instruction in instructions)
+			{
+				if (instruction.StoresField(weakSpotField))
+				{
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PreventFriendlyFireMarkerOverwrite), nameof(WriteWeakSpot)));
+				}
+				else
+				{
+					yield return instruction;
+				}
+			}
 		}
 	}
 
@@ -149,6 +216,27 @@ public static class Patches
 						guild.Members[player].lastOnline = DateTime.Now;
 						API.SaveGuild(guild);
 					}
+				}
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(ZNet), nameof(ZNet.UpdatePlayerList))]
+	private static class ProvideHostAsServerOwner
+	{
+		private static readonly FieldInfo backend = AccessTools.DeclaredField(typeof(ZNet), nameof(ZNet.m_onlineBackend)); 
+		
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			foreach (CodeInstruction instruction in instructions)
+			{
+				if (instruction.LoadsField(backend))
+				{
+					yield return new CodeInstruction(OpCodes.Ldc_I4, (int)OnlineBackendType.PlayFab);
+				}
+				else
+				{
+					yield return instruction;
 				}
 			}
 		}
