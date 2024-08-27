@@ -58,18 +58,9 @@ public class ApplicationClass
 	public string description = "";
 }
 
-public class CustomDataConverter: IYamlTypeConverter
+public class CustomDataConverter(IValueDeserializer valueDeserializer, IValueSerializer valueSerializer) : IYamlTypeConverter
 {
 	public static readonly Dictionary<string, Type> RegisteredCustomTypes = new();
-
-	private readonly IValueDeserializer valueDeserializer;
-	private readonly IValueSerializer valueSerializer;
-	
-	public CustomDataConverter(IValueDeserializer valueDeserializer, IValueSerializer valueSerializer)
-	{
-		this.valueDeserializer = valueDeserializer;
-		this.valueSerializer = valueSerializer;
-	}
 
 	public bool Accepts(Type type) => type == typeof(CustomData);
 

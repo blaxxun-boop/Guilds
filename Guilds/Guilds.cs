@@ -65,8 +65,6 @@ public class Guilds : BaseUnityPlugin
 		APIManager.Patcher.Patch();
 		Localizer.Load();
 
-		GuildsPath = Utils.GetSaveDataPath(FileHelpers.FileSource.Local) + Path.DirectorySeparatorChar + "Guilds";
-
 		serverConfigLocked = config("1 - General", "Lock Configuration", Toggle.Off, new ConfigDescription("Locks the config and enforces the servers configuration."));
 		configSync.AddLockingConfigEntry(serverConfigLocked);
 		guildInterfaceKey = config("1 - General", "Guild Interface Key", new KeyboardShortcut(KeyCode.O), new ConfigDescription("Keyboard shortcut to press in order to display the guild interface."), false);
@@ -112,11 +110,13 @@ public class Guilds : BaseUnityPlugin
 	{
 		private static bool first = true;
 
-		private static void Prefix()
+		private static void Postfix()
 		{
 			if (first)
 			{
 				first = false;
+
+				GuildsPath = Utils.GetSaveDataPath(FileHelpers.FileSource.Local) + Path.DirectorySeparatorChar + "Guilds";
 
 				GuildList.Init();
 				GuildList.readGuildFiles();

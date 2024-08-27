@@ -232,7 +232,7 @@ public static class Patches
 			{
 				if (instruction.LoadsField(backend))
 				{
-					yield return new CodeInstruction(OpCodes.Ldc_I4, (int)OnlineBackendType.PlayFab);
+					yield return new CodeInstruction(OpCodes.Ldc_I4, (int)OnlineBackendType.PlayFab) { labels = instruction.labels };
 				}
 				else
 				{
