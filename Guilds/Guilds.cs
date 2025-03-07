@@ -16,7 +16,7 @@ namespace Guilds;
 public class Guilds : BaseUnityPlugin
 {
 	private const string ModName = "Guilds";
-	private const string ModVersion = "1.1.9";
+	private const string ModVersion = "1.2.0";
 	private const string ModGUID = "org.bepinex.plugins.guilds";
 
 	public static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };

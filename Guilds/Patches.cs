@@ -146,13 +146,47 @@ public static class Patches
 			nameTransform.pivot = namePrivot;
 		}
 	}
+	
+	[HarmonyPatch(typeof(FejdStartup), nameof(FejdStartup.Awake))]
+	public static class FejdStartupFixMaterial
+	{
+		public static Material? originalMaterial = null;
+
+		static void Postfix(FejdStartup __instance)
+		{
+			AssetBundle[]? assetBundles = Resources.FindObjectsOfTypeAll<AssetBundle>();
+			foreach (AssetBundle? bundle in assetBundles)
+			{
+				IEnumerable<Material>? bundleMaterials;
+				try
+				{
+					bundleMaterials = bundle.isStreamedSceneAssetBundle && bundle
+						? bundle.GetAllAssetNames().Select(bundle.LoadAsset<Material>).Where(shader => shader != null)
+						: bundle.LoadAllAssets<Material>();
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				if (bundleMaterials == null) continue;
+				foreach (Material? mat in bundleMaterials)
+				{
+					if (mat && mat.name == "litpanel")
+					{
+						originalMaterial = mat;
+					}
+				}
+			}
+		}
+	}
 
 	[HarmonyPatch(typeof(Hud), nameof(Hud.Awake))]
 	public static class AffixGuildMenu
 	{
 		private static void Prefix(Hud __instance)
 		{
-			Transform transform = __instance.gameObject.GetComponentInParent<Localize>().gameObject.transform;
+			Transform hudroot = __instance.m_rootObject.transform;
 			Interface.NoGuildUIPrefab.SetActive(false);
 			Interface.SearchGuildUIPrefab.SetActive(false);
 			Interface.CreateGuildUIPrefab.SetActive(false);
@@ -161,16 +195,40 @@ public static class Patches
 			Interface.EditGuildUIPrefab.SetActive(false);
 			Interface.AchievementUIPrefab.SetActive(false);
 			Interface.AchievementPopupPrefab.SetActive(false);
-			Interface.NoGuildUI = Object.Instantiate(Interface.NoGuildUIPrefab, transform, false);
-			Interface.SearchGuildUI = Object.Instantiate(Interface.SearchGuildUIPrefab, transform, false);
-			Interface.CreateGuildUI = Object.Instantiate(Interface.CreateGuildUIPrefab, transform, false);
-			Interface.GuildManagementUI = Object.Instantiate(Interface.GuildManagementUIPrefab, transform, false);
-			Interface.ApplicationsUI = Object.Instantiate(Interface.ApplicationsUIPrefab, transform, false);
-			Interface.EditGuildUI = Object.Instantiate(Interface.EditGuildUIPrefab, transform, false);
-			Interface.AchievementUI = Object.Instantiate(Interface.AchievementUIPrefab, transform, false);
-			Interface.AchievementPopup = Object.Instantiate(Interface.AchievementPopupPrefab, transform, false);
-
+			Interface.NoGuildUI = Object.Instantiate(Interface.NoGuildUIPrefab, hudroot, false);
+			Interface.SearchGuildUI = Object.Instantiate(Interface.SearchGuildUIPrefab, hudroot, false);
+			Interface.CreateGuildUI = Object.Instantiate(Interface.CreateGuildUIPrefab, hudroot, false);
+			Interface.GuildManagementUI = Object.Instantiate(Interface.GuildManagementUIPrefab, hudroot, false);
+			Interface.ApplicationsUI = Object.Instantiate(Interface.ApplicationsUIPrefab, hudroot, false);
+			Interface.EditGuildUI = Object.Instantiate(Interface.EditGuildUIPrefab, hudroot, false);
+			Interface.AchievementUI = Object.Instantiate(Interface.AchievementUIPrefab, hudroot, false);
+			Interface.AchievementPopup = Object.Instantiate(Interface.AchievementPopupPrefab, hudroot, false);
+			FixBkgMaterial(Interface.NoGuildUI);
+			FixBkgMaterial(Interface.SearchGuildUI);
+			FixBkgMaterial(Interface.CreateGuildUI);
+			FixBkgMaterial(Interface.GuildManagementUI);
+			FixBkgMaterial(Interface.ApplicationsUI);
+			FixBkgMaterial(Interface.EditGuildUI);
+			FixBkgMaterial(Interface.AchievementUI);
+			FixBkgMaterial(Interface.AchievementPopup);
 			UnifiedPopup.instance.transform.SetAsLastSibling();
+		}
+
+		private static void FixBkgMaterial(GameObject ui)
+		{
+			if (FejdStartupFixMaterial.originalMaterial == null) return;
+			Transform? background = Utils.FindChild(ui.transform, "Background");
+			if (background is not null)
+			{
+				Image? uiBkg = background.GetComponent<Image>();
+				uiBkg.material = FejdStartupFixMaterial.originalMaterial;
+			}
+
+			Transform? backgroundBack = Utils.FindChild(ui.transform, "BackgroundBack");
+			if (backgroundBack is null) return;
+
+			Image? uiBkgBack = backgroundBack.GetComponent<Image>();
+			uiBkgBack.material = FejdStartupFixMaterial.originalMaterial;
 		}
 	}
 

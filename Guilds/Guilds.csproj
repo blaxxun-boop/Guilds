@@ -90,6 +90,12 @@
         <Reference Include="gui_framework">
             <HintPath>$(GamePath)\valheim_Data\Managed\gui_framework.dll</HintPath>
         </Reference>
+        <Reference Include="Splatform">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Splatform.dll</HintPath>
+        </Reference>
+        <Reference Include="Splatform.Steam">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Splatform.Steam.dll</HintPath>
+        </Reference>
         <Reference Include="LocalizationManager">
             <HintPath>Libs\LocalizationManager.dll</HintPath>
         </Reference>
@@ -238,6 +244,7 @@
     -->
     <Target Name="Copy" AfterTargets="ILRepack" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(GamePath)\BepInEx\plugins\$(AssemblyName).dll&quot;"/>
+        <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;C:\Users\crypt\AppData\Roaming\com.kesomannen.gale\valheim\profiles\test\BepInEx\plugins\Smoothbrain-Guilds\$(AssemblyName).dll&quot;"/>
     </Target>
     <Target Name="Move" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)' == 'API|AnyCPU'">
         <Exec Command="move &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(TargetDir)$(AssemblyName)API.dll&quot;"/>
