@@ -244,7 +244,6 @@
     -->
     <Target Name="Copy" AfterTargets="ILRepack" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(GamePath)\BepInEx\plugins\$(AssemblyName).dll&quot;"/>
-        <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;C:\Users\crypt\AppData\Roaming\com.kesomannen.gale\valheim\profiles\test\BepInEx\plugins\Smoothbrain-Guilds\$(AssemblyName).dll&quot;"/>
     </Target>
     <Target Name="Move" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)' == 'API|AnyCPU'">
         <Exec Command="move &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(TargetDir)$(AssemblyName)API.dll&quot;"/>
