@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using BepInEx;
 using JetBrains.Annotations;
+using Splatform;
 #if ! API
 using YamlDotNet.Serialization;
 #endif
@@ -125,7 +126,7 @@ public struct PlayerReference
 {
 	public static PlayerReference fromPlayerInfo(ZNet.PlayerInfo playerInfo) => new() { id = playerInfo.m_userInfo.m_id.ToString(), name = playerInfo.m_name ?? "" };
 	public static PlayerReference fromPlayer(Player player) => player == Player.m_localPlayer ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.FirstOrDefault(info => info.m_characterID == player.GetZDOID()));
-	public static PlayerReference forOwnPlayer() => new() { id = UserInfo.GetLocalUser().UserId.ToString(), name = Game.instance.GetPlayerProfile().GetName() };
+	public static PlayerReference forOwnPlayer() => new() { id = PlatformManager.DistributionPlatform?.LocalUser.PlatformUserID.ToString() ?? "", name = Game.instance.GetPlayerProfile().GetName() };
 #if !API
 	public static PlayerReference fromRPC(ZRpc? rpc) => rpc is null ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.First(p => p.m_userInfo.m_id.ToString().EndsWith(rpc.m_socket.GetHostName())));
 #endif
