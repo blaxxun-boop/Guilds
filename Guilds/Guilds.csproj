@@ -96,6 +96,9 @@
         <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
             <HintPath>Libs\ServerSync.dll</HintPath>
         </Reference>
+        <Reference Include="Splatform">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Splatform.dll</HintPath>
+        </Reference>
         <Reference Include="StatManager">
             <HintPath>Libs\StatManager.dll</HintPath>
         </Reference>

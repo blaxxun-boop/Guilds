@@ -111,7 +111,7 @@ public static class Map
 
 		ColorUtility.TryParseHtmlString(guild.General.color, out Color color);
 
-		Chat.instance.RPC_ChatMessage(senderId, position, type, name, text, PrivilegeManager.GetNetworkUserId());
+		Chat.instance.RPC_ChatMessage(senderId, position, type, name, text);
 		Chat.WorldTextInstance worldText = Chat.instance.FindExistingWorldText(senderId);
 		worldText.m_textMeshField.color = color;
 		guildPingTexts.Add(worldText, Array.Empty<object>());

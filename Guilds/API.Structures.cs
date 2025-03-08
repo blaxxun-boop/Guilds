@@ -123,11 +123,11 @@ public class AchievementConfig
 [TypeConverter(typeof(PlayerReferenceTypeConverter))]
 public struct PlayerReference
 {
-	public static PlayerReference fromPlayerInfo(ZNet.PlayerInfo playerInfo) => new() { id = playerInfo.m_host.IsNullOrWhiteSpace() ? PrivilegeManager.GetNetworkUserId() : playerInfo.m_host.Contains("_") ? playerInfo.m_host : $"Steam_{playerInfo.m_host}", name = playerInfo.m_name ?? "" };
+	public static PlayerReference fromPlayerInfo(ZNet.PlayerInfo playerInfo) => new() { id = playerInfo.m_userInfo.m_id.ToString(), name = playerInfo.m_name ?? "" };
 	public static PlayerReference fromPlayer(Player player) => player == Player.m_localPlayer ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.FirstOrDefault(info => info.m_characterID == player.GetZDOID()));
-	public static PlayerReference forOwnPlayer() => new() { id = PrivilegeManager.GetNetworkUserId(), name = Game.instance.GetPlayerProfile().GetName() };
+	public static PlayerReference forOwnPlayer() => new() { id = UserInfo.GetLocalUser().UserId.ToString(), name = Game.instance.GetPlayerProfile().GetName() };
 #if !API
-	public static PlayerReference fromRPC(ZRpc? rpc) => rpc is null ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.First(p => p.m_host == rpc.m_socket.GetHostName()));
+	public static PlayerReference fromRPC(ZRpc? rpc) => rpc is null ? forOwnPlayer() : fromPlayerInfo(ZNet.instance.m_players.First(p => p.m_userInfo.m_id.ToString().EndsWith(rpc.m_socket.GetHostName())));
 #endif
 
 	public string id;
