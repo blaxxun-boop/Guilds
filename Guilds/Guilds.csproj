@@ -135,7 +135,7 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+            <HintPath>C:\Users\crypt\OneDrive\Desktop\Libs\UnityEngine.ImageConversionModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
@@ -152,12 +152,6 @@
         <Reference Include="UnityEngine.UIModule">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UIModule.dll</HintPath>
             <Private>false</Private>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
-        <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e">
-            <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
-            <Private>true</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -209,9 +203,6 @@
         </Content>
     </ItemGroup>
     <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
-        <None Include="packages.config"/>
-    </ItemGroup>
-    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <EmbeddedResource Include="AchievementConfig.yml"/>
         <EmbeddedResource Include="assets\guildsbundle"/>
         <EmbeddedResource Include="Icons\Badges\*.png"/>
@@ -224,14 +215,14 @@
     <ItemGroup>
         <EmbeddedResource Include="translations\Portuguese_Brazilian.yml"/>
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets') and '$(Configuration)|$(Platform)' != 'API|AnyCPU' "/>
-    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-        <PropertyGroup>
-            <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
-        </PropertyGroup>
-        <Error Condition="!Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))"/>
-    </Target>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">

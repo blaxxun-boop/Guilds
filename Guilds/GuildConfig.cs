@@ -64,7 +64,7 @@ public class CustomDataConverter(IValueDeserializer valueDeserializer, IValueSer
 
 	public bool Accepts(Type type) => type == typeof(CustomData);
 
-	public object ReadYaml(IParser parser, Type _)
+	public object ReadYaml(IParser parser, Type _, ObjectDeserializer rootDeserializer)
 	{
 		parser.Consume<MappingStart>();
 		CustomData customData = new();
@@ -91,7 +91,7 @@ public class CustomDataConverter(IValueDeserializer valueDeserializer, IValueSer
 		return customData;
 	}
 
-	public void WriteYaml(IEmitter emitter, object? value, Type type)
+	public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
 	{
 		if (value is null)
 		{
