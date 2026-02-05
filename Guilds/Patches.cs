@@ -152,17 +152,15 @@ public static class Patches
 	{
 		public static Material? originalMaterial = null;
 
-		static void Postfix(FejdStartup __instance)
+		static void Postfix()
 		{
-			AssetBundle[]? assetBundles = Resources.FindObjectsOfTypeAll<AssetBundle>();
-			foreach (AssetBundle? bundle in assetBundles)
+			AssetBundle[] assetBundles = Resources.FindObjectsOfTypeAll<AssetBundle>();
+			foreach (AssetBundle bundle in assetBundles)
 			{
-				IEnumerable<Material>? bundleMaterials;
+				IEnumerable<Material> bundleMaterials;
 				try
 				{
-					bundleMaterials = bundle.isStreamedSceneAssetBundle && bundle
-						? bundle.GetAllAssetNames().Select(bundle.LoadAsset<Material>).Where(shader => shader != null)
-						: bundle.LoadAllAssets<Material>();
+					bundleMaterials = bundle.isStreamedSceneAssetBundle ? bundle.GetAllAssetNames().Select(bundle.LoadAsset<Material>).Where(shader => shader != null) : bundle.LoadAllAssets<Material>();
 				}
 				catch (Exception)
 				{

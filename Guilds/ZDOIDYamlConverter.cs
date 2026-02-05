@@ -12,7 +12,7 @@ public class ZDOIDYamlConverter : IYamlTypeConverter
 		return type == typeof(ZDOID);
 	}
 
-	public object ReadYaml(IParser parser, Type type)
+	public object ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
 	{
 		Scalar scalar = (Scalar)parser.Current!;
 		string[] parts = scalar.Value.Split(':');
@@ -21,7 +21,7 @@ public class ZDOIDYamlConverter : IYamlTypeConverter
 		return bytes;
 	}
 
-	public void WriteYaml(IEmitter emitter, object? value, Type type)
+	public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
 	{
 		ZDOID id = (ZDOID)value!;
 		emitter.Emit(new Scalar($"{id.UserID}:{id.ID}"));
