@@ -72,6 +72,11 @@ public static class AchievementTracker
 			{
 				API.IncreaseAchievementProgress(guild, "Found Hildir");
 			}
+			
+			if (Utils.GetPrefabName(__instance.gameObject) == "BogWitch")
+			{
+				API.IncreaseAchievementProgress(guild, "Found Bog Witch");
+			}
 		}
 	}
 

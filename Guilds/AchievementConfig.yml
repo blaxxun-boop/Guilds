@@ -28,6 +28,13 @@ Found Hildir:
   level: [1]
   first: true
 
+Found Bog Witch:
+  name: "Try To Hide Better Next Time!"
+  description: "Be the first to find Bog Witch the trader."
+  icon: "BogWitchFound.png"
+  level: [1]
+  first: true
+
 Spend Coins:
   name: "I Was A Business Man ... Doing Business."
   description: "Spend coins at a trader."
