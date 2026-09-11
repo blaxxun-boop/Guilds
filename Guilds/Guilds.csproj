@@ -9,9 +9,9 @@
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>Guilds</RootNamespace>
         <AssemblyName>Guilds</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
-        <LangVersion>12</LangVersion>
+        <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -135,8 +135,7 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.ImageConversionModule_Old.dll</HintPath>
-            <Private>false</Private>
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.ImageConversionModuleOld.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>

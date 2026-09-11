@@ -29,8 +29,8 @@ Found Hildir:
   first: true
 
 Found Bog Witch:
-  name: "Try To Hide Better Next Time!"
-  description: "Be the first to find Bog Witch the trader."
+  name: "Which witch? This witch!"
+  description: "Be the first to find the Bog Witch."
   icon: "BogWitchFound.png"
   level: [1]
   first: true
